@@ -1,0 +1,12 @@
+name: ehac
+version: 1
+cron:
+- description: get access_token per 2 hour
+  url: /access_token.php
+  schedule: "* */2 * * *"
+- description: update mysql per 1 min
+  url: ehac/mysql2.php
+  schedule: "*/1 * * * *"
+- description: update mysql per 1 min
+  url: /mysql.php
+  schedule: "*/1 * * * *"
