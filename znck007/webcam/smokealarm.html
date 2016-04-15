@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>烟雾/煤气/气体报警器-智能创客</title>
+<meta name="keywords" content="烟雾/煤气/气体报警器-智能创客" />
+<meta name="description" content="烟雾/煤气/气体报警器-智能创客" />
+<meta name="copyright" content="www.znck007.com" />
+<meta name="viewport" content="user-scalable=0" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+
+<link href="css/global.css" rel="stylesheet" type="text/css" />
+
+<script language="javascript" type="text/javascript">
+
+var url="../cgi-bin/smokealarm?mode=alarmdata";//获取传感器数据网址
+var alarmvalue=500;//默认的警报值
+var alarmemail="610854837@qq.com";//默认的提醒email
+var emailurl="http://api.znck007.com/email/";//发邮件的api
+var emailtime=0;//发邮件时间
+
+var xmlhttp;
+
+//调用发送邮件
+function sendemail(url,alarmcontent,alarmemail) {
+     if(alarmemail=="") return;
+
+     var myDate = new Date();
+     var mytime=myDate.getTime();
+     if( mytime-emailtime<60000 ) {return;} //发送间隔要大于60秒 alert(mytime-emailtime);
+     emailtime=mytime;
+
+    //确定浏览器
+    if(window.XMLHttpRequest) {
+        //针对FireFox、Mozillar、Opera、Safari、IE7、IE8
+        //创建XMLHttpRequest对象
+        xmlhttp = new XMLHttpRequest();
+        //修正某些浏览器的BUG
+        if(xmlhttp.overrideMimeType) {
+            xmlhttp.overrideMimeType("text/html");
+        }
+    }else if(window.ActiveXObject){
+        //针对IE5、IE5.5、IE6
+        //这两个为插件名称作为参数传递，为了创建ActiveXObject
+        var activeName = ["MSXML2.XMLHTTP","Microsoft.XMLHTTP"];
+        for(var i=0;i>activeName.length();i++) {
+              try{
+                  //非别取出，如果创建成功则终止循环，如果失败则会抛出异常继续循环
+                  xmlhttp = new ActiveXObject(activeName[i]);
+                  break;
+              }catch(e){
+              }
+        }
+    }
+    //确定XMLHttpRequest是否创建成功
+    /*if(!xmlhttp) {
+        alert("XMLHttpRequest创建失败!");
+        return;
+    }else {
+        alert("XMLHttpRequest创建成功!"+xmlhttp);
+    }*/
+
+    //注册回调函数
+    //xmlhttp.onreadystatechange=callback;
+    
+    //设置连接信息
+    //1.是http请求的方式
+    //2.是服务器的地址
+    //3.是采用同步还是异步，true为异步
+    //xmlhttp.open("GET",url,true);
+    //post请求与get请求的区别
+    //第一个参数设置成post第二个只写url地址，第三个不变
+    xmlhttp.open("POST",url,true);
+    //post请求要自己设置请求头
+    xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    //发送数据，开始与服务器进行交互
+    //post发送请求
+    xmlhttp.send("alarmcontent="+alarmcontent+"&alarmemail="+alarmemail);           
+      
+}
+
+//获取传感器值
+function httppost(url) {
+
+    //确定浏览器
+    if(window.XMLHttpRequest) {
+        //针对FireFox、Mozillar、Opera、Safari、IE7、IE8
+        //创建XMLHttpRequest对象
+        xmlhttp = new XMLHttpRequest();
+        //修正某些浏览器的BUG
+        if(xmlhttp.overrideMimeType) {
+            xmlhttp.overrideMimeType("text/html");
+        }
+    }else if(window.ActiveXObject){
+        //针对IE5、IE5.5、IE6
+        //这两个为插件名称作为参数传递，为了创建ActiveXObject
+        var activeName = ["MSXML2.XMLHTTP","Microsoft.XMLHTTP"];
+        for(var i=0;i>activeName.length();i++) {
+              try{
+                  //非别取出，如果创建成功则终止循环，如果失败则会抛出异常继续循环
+                  xmlhttp = new ActiveXObject(activeName[i]);
+                  break;
+              }catch(e){
+              }
+        }
+    }
+    //确定XMLHttpRequest是否创建成功
+    /*if(!xmlhttp) {
+        alert("XMLHttpRequest创建失败!");
+        return;
+    }else {
+        alert("XMLHttpRequest创建成功!"+xmlhttp);
+    }*/
+
+    //注册回调函数
+    xmlhttp.onreadystatechange=callback;
+    
+    //设置连接信息
+    //1.是http请求的方式
+    //2.是服务器的地址
+    //3.是采用同步还是异步，true为异步
+    //xmlhttp.open("GET",url,true);
+    //post请求与get请求的区别
+    //第一个参数设置成post第二个只写url地址，第三个不变
+    xmlhttp.open("POST",url,true);
+    //post请求要自己设置请求头
+    xmlhttp.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    //发送数据，开始与服务器进行交互
+    //post发送请求
+    xmlhttp.send("alarmvalue="+alarmvalue+"&alarmemail="+alarmemail);
+           
+       
+}
+
+//返回httppost值
+function callback() {
+      var divresult = document.getElementById("alarmdata");
+      var alarm= document.getElementById("alarm");
+
+    //接收响应数据     
+    //判断对象状态是否交互完成，如果为4则交互完成
+    if(xmlhttp.readyState == 4) {
+	  
+         //判断对象状态是否交互成功,如果成功则为200
+        if(xmlhttp.status == 200) {
+            	//接收数据,得到服务器输出的纯文本数据
+            	var response = xmlhttp.responseText;
+		response = response.replace(/\n|\r/g,"");//替换回车、换行符
+
+            	var color="#00ff00";//默认为绿色
+		alarm.src="./img/alarmgreen.png";//默认图片为绿色
+
+		if(response>alarmvalue){//如果超过报警值则变红色
+			color="#ff0000";
+			alarm.src="./img/alarmred.png";			
+			sendemail(emailurl,"危险报警："+response,alarmemail);//调用发邮件
+		}
+
+	   	var li_html="";
+	   	li_html=li_html+"<span style=\"color:"+color+";font-size:80px;\" id=\"alarmdata\">";
+		li_html=li_html+response;
+		li_html=li_html+"№</span>";
+            	divresult.innerHTML = li_html;//显示报警值
+		
+	
+        }
+	  else{	
+		var color="#00ff00";
+	   	var li_html="";
+	   	li_html=li_html+"<span style=\"color:"+color+";font-size:80px;\" id=\"alarmdata\">";
+		li_html=li_html+xmlhttp.status;
+		li_html=li_html+"错误</span>";
+            	divresult.innerHTML = li_html;	
+		
+	  }	  
+	  //每秒刷新一次页面
+      	  setTimeout("httppost('"+url+"')", 1000);
+    }
+      
+     
+}
+
+//设置警告值
+function setalarm(val,email) {	
+	
+	if( val==0 ){
+		//如果值为0则取输入框的值
+		alarmvalue= document.getElementById("alarmvalue").value;
+		alarmemail= document.getElementById("alarmemail").value;
+		alert("设置数据成功！"+alarmvalue);
+	}else{
+		//否则设置到输入框
+		alarmvalue= val;
+		alarmemail= email;
+		document.getElementById("alarmvalue").value=val;
+		document.getElementById("alarmemail").value=email;
+	}
+	
+}
+
+
+</script>
+
+</head>
+
+<!--打开网页运行javascript-->
+<body onLoad="setalarm(500,''),httppost('../cgi-bin/smokealarm?mode=alarmdata')">
+
+<!--顶部-->
+<table class="top" border="0" cellspacing="0" cellpadding="0">
+    <colgroup>
+        <col width="70px" />
+        <col />
+        <col width="70px" />
+    </colgroup>
+    <tr>
+        <td><button onClick="javascript:history.back()"></button></td>
+        <td>烟雾/煤气/气体报警器-智能创客</td>
+        <td></td>
+    </tr>
+</table>
+
+
+
+
+<table border="0" cellpadding="0" cellspacing="0" class="search_btn">
+    <colgroup><col/><col width="5px" /><col width="32px" /></colgroup>
+    <tbody> 		
+	
+	
+	<tr>		
+		<td colspan=3 align="center"><a ><img src="./img/alarmgreen.png" id="alarm"/></a></td>
+	</tr>
+	<tr >		
+		<td colspan=3 align="center"><a target="_blank">提示：绿色为正常，红色为报警！</a></td>
+	</tr>	
+	<tr height="20">		
+		<td colspan=3 align="center"></td>
+	</tr>
+
+	<tr >		
+		<td colspan=3 align="center">
+		<span style="color:#ff6699;">当前烟雾气体值：</span><br>
+		<span style="color:#00ff00;font-size:80px;" id="alarmdata">0№</span>
+		</td>
+	</tr>
+
+	<tr height="50">		
+		<td colspan=3 align="center"></td>
+	</tr>
+	
+	<tr>		
+		<td colspan=3 align="center">
+		报警值:<input maxlength="32" type="text" id="alarmvalue" name="alarmvalue" placeholder="请填写报警值..." />
+		邮箱:<input maxlength="64" type="text" id="alarmemail" name="alarmemail" placeholder="请填写手机邮箱..." />	
+		<button type="submit" onclick="setalarm(0,'')">设置</button>  		
+		</td>
+	</tr>
+	
+
+	<tr height="50">		
+		<td colspan=3 align="center"></td>
+	</tr>	
+		
+	
+	
+	
+    </tbody>		
+
+</table>
+
+<!--
+<div style="padding: 0 8px"><BR><BR><BR><BR><button type="submit" style="width: 100%" class="button2" >设置</button></div>
+-->
+
+
+
+
+<!--底部--> 
+<div class="clear2"></div>
+<div data-role="footer" style="text-align:center;">   
+   <p style="color:#B4B4B4"><a href="http://www.znck007.com" target="_blank" style="text-decoration:none;color:#B4B4B4">论坛</a>&nbsp;|&nbsp;<a href="http://weibo.cn/znck007" target="_blank" style="color:#B4B4B4;">微博</a>&nbsp;|&nbsp;<a href="http://www.znck007.com/wap/img/qrcode_for_gh_9be0babbcc4b_258.jpg" target="_blank" style="color:#B4B4B4;">微信znck007</a></p>
+   <p style="color:#B4B4B4;margin-top:5px">@智能创客 每周手把手教您DIY智能产品</p>
+</div>
+</body>
+</html>
+

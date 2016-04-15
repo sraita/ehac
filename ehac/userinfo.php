@@ -18,6 +18,7 @@ $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass
 		$email = $row['email'];
 		$alarm = $row['alarm'];
 		$sex=$row['sex'];
+      
  	}
 	$update_useer = "SELECT * FROM " . $mysql_table . " WHERE openid ='o_x4Lj0NzaEevvqdSl5vypXE3BvY' ";
 	mysql_close ( $con );
@@ -29,7 +30,7 @@ $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass
          <div class="navbar-inner" data-page="leave_mode">
              <div class="left">
                 <!-- Right link contains only icon - additional "icon-only" class-->
-                <a href="#" class="link icon-only open-panel"><i class="icon icon-bars color-white"></i></a>
+                <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
               </div>
               <div class="center">个人中心</div>
               <div class="right">
@@ -39,44 +40,22 @@ $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass
       </div>
         <!-- Pages -->
         <div class="pages navbar-through">
-          
- 
-          <!-- About page -->
           <div class="page" data-page="userinfo">
             <div class="page-content">
               <div class="list-block" >
                 <ul>
-                    <form action="./php/update.php?action=update" id="userinfo" method="POST" class="ajax-submit-onchange">                  
+                    <form action="./php/update.php?action=update" id="userinfo" method="POST" class="ajax-submit-onchange">  
+                  <li class="item-divider">基本信息</li>
                   <li>
                     <div class="item-content">
                       <div class="item-inner"> 
-                        <div class="item-media"><i class="icon icondevice color-green">&#xe635;</i></div>
+                        <div class="item-title label">昵称</div>
                         <div class="item-content">
                           <input type="text"  readonly name="weixin" value="<?php  echo $nickname; ?>">
                         </div>
                       </div>
                     </div>
                   </li>
-                  <li>
-                    <div class="item-content">
-                      <div class="item-inner"> 
-                        <div class="item-media"><i class="icon icondevice color-orange">&#xe62d;</i></div>
-                        <div class="item-content">
-                          <input type="text"  readonly name="name" value="<?php  echo $name; ?>">
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <div class="item-title label">设备位置</div>
-                            <div class="item-content">
-                            <input type="text" placeholder="设备位置" readonly id="chengshi">
-                            </div>
-                        </div>
-                    </div>
-                    </li>
                     <!-- Select -->
                     <li>
                     <div class="item-content">
@@ -91,27 +70,17 @@ $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass
                         </div>
                     </div>
                     </li>
-                    <!-- Date -->
-                    <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <div class="item-title label">开始使用</div>
-                            <div class="item-input">
-                            <input type="date" placeholder="Birth day" readonly value="2014-04-30">
-                            </div>
-                        </div>
-                    </div>
-                    </li>
                     <li>
                     <div class="item-content" >
                         <div class="item-inner">
-                        <div class="item-title label">邮件通知</div>
+                        <div class="item-title label">Email </div>
                             <div class="item-input">
            						 <input type="email" name="email" value="<?php  echo $email; ?>">
          					 </div>
                         </div>
                     </div>
                     </li>
+                    <li class="item-divider">自动调节设置</li>
                     <li>
                         <a href="automate.php">
                     <div class="item-content" >
@@ -121,6 +90,7 @@ $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass
                     </div>
                     </a>
                     </li>
+                    <li class="item-divider">设置气体预警值</li>
                     <li>
                         <a href="#" class=" smart-select" data-page-title="预警值" data-back-text="返回" data-back-on-select="true">
                         <select name="alarm" >

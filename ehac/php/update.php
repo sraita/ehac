@@ -15,11 +15,12 @@ break;
 //预警
 case "automate": 
 	$temp_device = $_POST['temp_device'];
-	$temp = $_POST['temp'];
+    $temp_l = substr($_POST['temp'],0,2);
+    $temp_h = substr($_POST['temp'],8,2);
 	$humidity_device = $_POST['humidity_device'];
 	$humidity_l = $_POST['humidity_l'];
 	$humidity_h = $_POST['humidity_h'];
-	$automate="UPDATE ehac_user SET temp_device = '".$temp_device."',temp = '".$temp."',humidity_device='".$humidity_device."', humidity_l = '".$humidity_l."', humidity_h = '".$humidity_h."'  WHERE openid = 'o_x4Lj0NzaEevvqdSl5vypXE3BvY'";
+	$automate="UPDATE ehac_user SET temp_device = '".$temp_device."',temp_l = '".$temp_l."',temp_h = '".$temp_h."',humidity_device='".$humidity_device."', humidity_l = '".$humidity_l."', humidity_h = '".$humidity_h."'  WHERE openid = 'o_x4Lj0NzaEevvqdSl5vypXE3BvY'";
 mysql_query($automate, $link);  
 break;
 //修改设备信息

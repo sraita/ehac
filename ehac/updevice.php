@@ -4,7 +4,7 @@
  <!-- Home page navbar -->
  <div class="navbar-inner" data-page="updevice">
   <div class="left"><a href="#" class="back link"> <i class="icon icon-back"> </i><span>取消</span></a></div>
-  <div class="center">自动调节</div>
+  <div class="center">设备信息</div>
  </div>
 </div>
 <!-- Pages -->
@@ -31,7 +31,7 @@
                   <li>
                     <div class="item-content">
                       <div class="item-inner"> 
-                        <div class="item-title label">设备名称<?php echo $row['id'];?></div>
+                        <div class="item-title label">设备名称</div>
                         <div class="item-input">
                           <input type="text" name="devicename" value="<?php echo $row['devicename'];?>">
 						  <input type="hidden" name="id" value="<?php echo $row['id'];?>">

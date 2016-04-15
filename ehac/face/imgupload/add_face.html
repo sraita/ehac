@@ -1,0 +1,53 @@
+<!-- add Face -->
+<!-- Navbar -->
+        <div class="navbar">
+          <!-- Home page navbar -->
+         <div class="navbar-inner" data-page="add_face">
+             <div class="left">
+                <!-- Right link contains only icon - additional "icon-only" class-->
+                <a href="#" popup-data="history" class="link back"><i class="icon icon-back"></i>返回</a>
+              </div>
+              <div class="center">Face++</div>
+              <div class="right">Face++</div>
+         </div>
+      </div>
+<!-- Pages -->
+<div class="pages">
+<!-- page -->
+	<div class="page" data-page="add_face">
+		<div class="page-content demo">
+            <div class="card">
+              <div class="card-header">添加Face</div>
+              <div class="card-content bbody">
+                
+                	<!-- upload form -->
+                <form id="upload_form" enctype="multipart/form-data" method="post" action="./css/imgupload/upload.php" onSubmit="return checkForm()">
+                                        <!-- hidden crop params -->
+                    <input type="hidden" id="x1" name="x1" />
+                    <input type="hidden" id="y1" name="y1" />
+                    <input type="hidden" id="x2" name="x2" />
+                    <input type="hidden" id="y2" name="y2" />
+                <div class="card-content-inner"><input type="file" name="image_file" id="image_file" onChange="fileSelectHandler()" /></div>
+                 <div class="error"></div>
+
+                    <div class="step2">
+                        <h2>请选择需要截图的部位,然后按上传</h2>
+                        <img id="preview" />
+
+                        <div class="info">
+                            <label>文件大小</label> <input type="text" id="filesize" name="filesize" />
+                            <label>类型</label> <input type="text" id="filetype" name="filetype" />
+                            <label>图像尺寸</label> <input type="text" id="filedim" name="filedim" />
+                            <label>宽度</label> <input type="text" id="w" name="w" />
+                            <label>高度</label> <input type="text" id="h" name="h" />
+                        </div>
+
+                        <input type="submit" value="上传" />
+                    </div>
+                </form>
+              </div>
+              <div class="card-footer">Card Footer</div>
+            </div>			       
+		</div>
+	</div>
+</div>

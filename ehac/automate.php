@@ -34,13 +34,13 @@
                         $result = mysql_query ( $mysql_state );
                         while($row = mysql_fetch_array($result))
                         { 
-                         if($row['type']==1) {
+                         if($row['data']==null&&$row['sid']==3) {
                              $device_id = $row['id'];
                              $devicepic = $row['devicepic'];
 							 $devicename = $row['devicename'];
                             echo '<option value="';
 							echo $device_id;
-							echo '" data-option-image="img/device/iconfont-';
+							echo '" data-option-image="img/device/';
 							echo $devicepic;
 							echo '.png">';
 							echo $devicename;
@@ -56,13 +56,33 @@
           </div>
         </div></a>
       </li>
+		        <?php
+                    include 'include/conn.php';
+                    $mysql_table = "ehac_user";
+                    $mysql_state = "SELECT * FROM " . $mysql_table . " WHERE openid ='o_x4Lj0NzaEevvqdSl5vypXE3BvY' ";
+                    $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_password, true );
+                        if (! $con) {
+                            die ( 'Could not connect: ' . mysql_error () );
+                        }
+						
+                        mysql_query ( "SET NAMES 'UTF8'" );
+                        mysql_select_db ( $mysql_database, $con );
+                        $result = mysql_query ( $mysql_state );
+                        while($row = mysql_fetch_array($result))
+                        { 
+      					     $temp_l = $row['temp_l'];
+        				     $temp_h = $row['temp_h'];  
+						}
+						 mysql_close ( $con );
+				?>      
+
           <!-- Text inputs -->
      <li>
                     <div class="item-content">
                       <div class="item-inner"> 
                         <div class="item-title label">温度范围</div>
                         <div class="item-input">
-                           <input type="text" name="temp" placeholder="15℃-25℃" readonly id="automate">
+                           <input type="text" name="temp" placeholder="<?php echo $temp_l;?>℃-<?php echo $temp_h;?>℃" readonly id="automate">
 
                         </div>
                       </div>
@@ -90,7 +110,7 @@
                         $result = mysql_query ( $mysql_state );
                         while($row = mysql_fetch_array($result))
                         { 
-                         if($row['type']==1) {
+                         if($row['data']==null&&$row['sid']==3) {
                              $device_id = $row['id'];
                              $devicepic = $row['devicepic'];
 							 $devicename = $row['devicename'];
@@ -156,12 +176,12 @@
                         </a>
                         
                     </li>
-
-   
-  </ul>
-</div>
-  </div>
- </div>
- </form>
-</div>
+       
+              </ul>
+            </div>
+         </form>
+        </div>
+     </div>
+    </div>
+     
 

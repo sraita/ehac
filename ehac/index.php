@@ -45,6 +45,8 @@ function https_request($url)
 	curl_close($curl);
 	return $data;
 }
+require_once 'face/facepp_sdk.php';
+$facepp = new Facepp();
 ?>
 <html>
   <head>
@@ -58,6 +60,48 @@ function https_request($url)
 	<link rel="stylesheet" href="css/framework7.themes.min.css">
     <!-- Path to your custom app styles-->
     <link rel="stylesheet" href="css/todo7.css">
+    <link href="css/main.css" rel="stylesheet" type="text/css" />
+    <link href="css/jquery.Jcrop.min.css" rel="stylesheet" type="text/css" />
+    <!-- add scripts -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.Jcrop.min.js"></script>
+    <script src="js/script.js"></script>
+      <style>
+          li .unlink{
+              color:red;
+          }
+          .facebook-card{
+              padding:0;
+              margin:0;
+          }
+          .facebook-card .card-header {
+            display: block;
+            padding: 20px;
+          }
+          .facebook-card .facebook-avatar {
+            float: left;
+          }
+          .facebook-card .facebook-name {
+            margin:5 100px;
+            font-size: 16px;
+            font-weight: 500;
+              color: #ffffff;
+          }
+          .facebook-card .facebook-date {
+            font-size: 16px;
+            color: #ffffff;
+          }
+          .facebook-card .facebook-name img
+          {
+              border:2px solid #ffffff;
+              border-radius:100%;
+          
+          }
+          .fileInput{width:102px;height:34px; background:url(http://ehac-img.stor.sinaapp.com/005EB277AC3A84244D9941ECA550364B_dat.jpg);overflow:hidden;position:relative;}
+ 		  .upfile{position:absolute;top:-100px;}
+ 		  .upFileBtn{width:102px;height:34px;opacity:0;filter:alpha(opacity=0);cursor:pointer;}
+     
+      </style>
   </head>
   <body>
     <div class="statusbar-overlay"></div>
@@ -72,8 +116,8 @@ function https_request($url)
 				  <li  valign="bottom" class="fengmian card demo-card-header-pic no-border">
 					  <div  class="card-header color-white no-border">
 						<div class="facebook-avatar"><img src="<?php echo $userinfo["headimgurl"];?>" width="44" height="44"></div>
-						<div class="facebook-name">SRAITA</div>
-						<div class="facebook-date">weitas@qq.com</div>
+						<div class="facebook-name"><?php echo $userinfo["nickname"];?></div>
+						<div class="facebook-date"><?php  echo $userinfo["sex"];?></div>
 					  </div>
 					  <div class="card-content">
 						<div class="card-content-inner">
@@ -100,6 +144,18 @@ function https_request($url)
                           <div class="item-title">关于</div>
                         </div>
                       </div></a></li>
+                  <li><a href="#"  data-popup=".popup-face-group" class="close-panel open-popup">
+                      <div class="item-content">
+                        <div class="item-inner"> 
+                          <div class="item-title">Face++ Group</div>
+                        </div>
+                      </div></a></li>    
+				  <li><a href="#"  data-popup=".popup-face-history" class="close-panel open-popup">
+                      <div class="item-content">
+                        <div class="item-inner"> 
+                          <div class="item-title">Face++ 记录</div>
+                        </div>
+                      </div></a></li>                    
                 </ul>
               </div>
             </div>
@@ -136,10 +192,13 @@ function https_request($url)
                   <div class="preloader"></div>
                   <div class="pull-to-refresh-arrow"></div>
                 </div>
+                							 
+			 <div class="content-block-title">设备列表</div>
+				<div class="list-block media-list">
+					  <ul>
               <?php
                     include 'include/conn.php';
-                    $mysql_table = "device";
-                    $mysql_state = "SELECT * FROM " . $mysql_table . " WHERE openid ='o_x4Lj0NzaEevvqdSl5vypXE3BvY' ";
+                    $mysql_state = "SELECT * FROM device  WHERE openid ='o_x4Lj0NzaEevvqdSl5vypXE3BvY' ";
                     $con = mysql_connect ( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_password, true );
                         if (! $con) {
                             die ( 'Could not connect: ' . mysql_error () );
@@ -148,33 +207,75 @@ function https_request($url)
                         mysql_select_db ( $mysql_database, $con );
                         $result = mysql_query ( $mysql_state );
                         while($row = mysql_fetch_array($result))
-                        { if($row['type']==3) {
-                             $yanwu = $row['data'];}
-                         if($row['type']==2) {
-                             $temp = $row['wendu'];
-                             $shidu = $row['shidu'];?>
-							 <div class="list-block cards-list">
-								<ul>
-							 <li class="swiper-container swiper-init card facebook-card" data-speed="400" data-space-between="40" data-pagination=".swiper-pagination">
-								<div class="swiper-wrapper card-content" style="height:200px; width:100vmax;">
-									<div class="swiper-slide" id="smoke" style="height:200px; width:100vmax;"></div>
-									<div class="swiper-slide"style="height:200px; width:100vmax;">
-										<div id="wenshidu" style="background-image:url(img/tmp_bg.png);  background-size:cover;height:200px;width:200px; float:left;"></div>
-											<div class="temp">
-											<p class="color-green"><i class="icon iconfont">&#xe607;</i><?php echo $shidu;?> %</p>
-											<p class="color-orange"><i class="icon iconfont">&#xe601;</i><?php echo $temp;?>℃</p>
-										</div>
-									</div>
-									<div class="swiper-slide pb-standalone-video"style="height:200px; width:100vmax; background-image:url(img/home_mode.jpg); background-size:cover;"  ></div>
-								</div>
-								<div class="swiper-pagination"></div>
-							  </li> 
-							  </ul>
+                        { 
+                         if($row['data']!= null&&$row['sid']==1) {
+                             $temp = substr($row['data'],3);
+                             $shidu = substr($row['data'],0,2);?>
+                          <li class="swipeout">
+						<div class="swipeout-content">
+						  <div class="item-content">
+                              <div class="item-media"><img src="img/device/<?php echo $row['devicepic'];?>.png" width="44"></div>
+							<div class="item-inner">
+							  <div class="item-title-row">
+								<div class="item-title"><a href="temp.php" class="unlink olor-green"><?php echo $row['devicename'];?> </a></div>
 							  </div>
-			 <div class="content-block-title">设备列表</div>
-				<div class="list-block media-list">
-					  <ul>
-                         <?php  } if($row['type']==1) {?>
+							  <div class="item-subtitle"><?php echo $shidu;?> % <?php echo $temp;?>℃</div>
+							</div>
+						  </div>
+						</div>
+						<div class="swipeout-actions-right">
+							<a href="updevice.php?deviceid=<?php echo $row['id'];?>" class="bg-green">设备信息</a>
+							<a class="swipeout-delete bg-red" href="./php/del.php?id=<?php echo $row['id'];?>">删除</a>
+					    </div>
+                              </li>
+                         <?php  } if($row['data']!= null&&$row['sid']==2) {?>
+                          						<li class="swipeout">
+						<div class="swipeout-content">
+						  <div class="item-content">
+                              <div class="item-media"><img src="img/device/<?php echo $row['devicepic'];?>.png" width="44"></div>
+							<div class="item-inner">
+							  <div class="item-title-row">
+                                  <div class="item-title"><a href="smokealarm.php" class="unlink color-black"><?php echo $row['devicename'];?></a></div>
+							  </div>
+                                <div class="item-subtitle"><?php echo $row['data'];?>  N<small>2</small>O</div>
+							</div>
+						  </div>
+						</div>
+						<div class="swipeout-actions-right">
+							<a href="updevice.php?deviceid=<?php echo $row['id'];?>" class="bg-green">设备信息</a>
+							<a class="swipeout-delete bg-red" href="./php/del.php?id=<?php echo $row['id'];?>">删除</a>
+					    </div>
+						</li> 
+                          <?php  } if($row['data']== null&&$row['sid']==4) {?>
+                          						<li class="swipeout">
+						<div class="swipeout-content">
+						  <div class="item-content">
+                              <div class="item-media"><img src="img/device/<?php echo $row['devicepic'];?>.png" width="44"></div>
+							<div class="item-inner">
+							  <div class="item-title-row">
+								<div class="item-title"><?php echo $row['devicename'];?></div>
+							  </div>
+                                <div class="item-subtitle">
+                                 <?php 
+                                   if($row['status']==0)
+                         			{
+		                             echo "环境正常";
+                                   }else if($row['status']==1){
+                                     echo "环境异常";
+                                   }else{
+                                     echo "设备连接失败！";
+                                   }
+                                   ?>                                
+                                </div>
+							</div>
+						  </div>
+						</div>
+						<div class="swipeout-actions-right">
+							<a href="updevice.php?deviceid=<?php echo $row['id'];?>" class="bg-green">设备信息</a>
+							<a class="swipeout-delete bg-red" href="./php/del.php?id=<?php echo $row['id'];?>">删除</a>
+					    </div>
+						</li> 
+                         <?php  } if($row['data']==null&&$row['sid']==3) {?>
 						<li class="swipeout">
 						<div class="swipeout-content">
 						  <div class="item-content">
@@ -183,7 +284,18 @@ function https_request($url)
 							  <div class="item-title-row">
 								<div class="item-title"><?php echo $row['devicename'];?></div>
 							  </div>
-							  <div class="item-subtitle">Beatles</div>
+							  <div class="item-subtitle">
+                                  <?php 
+                                   if($row['status']==0)
+                         			{
+		                             echo "状态：关闭";
+                                   }else if($row['status']==1){
+                                     echo "状态：打开";
+                                   }else{
+                                     echo "设备连接失败！";
+                                   }
+                                   ?>
+                              </div>
 							</div>
 						  </div>
 						</div>
@@ -213,46 +325,96 @@ function https_request($url)
         <div class="pages navbar-through">
           
  
-          <!-- page -->
-          <div class="page" data-page="userinfo">
-            <div class="page-content">
-              
-            </div>
-          </div>
+
  
           
         </div>
 
       </div>
       <div id="view-3" class="view view-scene tab">
-           <!-- Navbar -->
+         <!-- Top Navbar-->
         <div class="navbar">
-
-
-        </div>
-           <!-- Pages -->
-        <div class="pages navbar-through">
-		
+          <!-- Navbar inner for Index page-->
+          <div data-page="index" class="navbar-inner">
+            <!-- We have home navbar without left link-->
+            <div class="left">
+              <!-- Right link contains only icon - additional "icon-only" class--><a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+            </div>
+            <div class="center sliding">Face++</div>
+            <div class="right">
+                <a href="face/person/add_person.php"   class="link icon-only "><i class="icon icon-plus">+</i></a>
+            </div>
           </div>
+        </div>
+        <div class="pages navbar-through">
+          <div data-page="index-2" class="page">
+              <!-- Search bar -->
+              <form data-search-list=".list-block-search" data-search-in=".item-inner" class="searchbar searchbar-init">
+                <div class="searchbar-input">
+                  <input type="search" placeholder="Search"><a href="#" class="searchbar-clear"></a>
+                </div><a href="#" class="searchbar-cancel">Cancel</a>
+              </form>
+             
+              <!-- Search bar overlay -->
+              <div class="searchbar-overlay"></div>
+            <div class="page-content">
+                  <div class="list-block">
+                  <ul>
+                    <li class="item-content">
+                      <div class="item-media"><i class="icon iconfont">&#xe607;</i></div>
+                      <div class="item-inner">
+                        <div class="item-title">访客管理</div>
+                      </div>
+                    </li>
+                    <li class="item-content">
+                      <div class="item-media"><i class="icon iconfont">&#xe601;</i></div>
+                      <div class="item-inner">
+                        <div class="item-title">未采集识别照片</div>
+                      </div>
+                    </li>                      
+                    </ul>
+                    </div>
+              <div class="list-block media-list list-block-search  searchbar-found">
+                <ul>
+                    <?php 
+                        $personlist = $facepp->execute('/info/get_person_list',array(''));
+                        $arr = json_decode($personlist,true); //后面加true转换为数组
+                        $b = count($arr['person']);
+                        for($j=0;$j<$b;$j++){
+                           $get_face_id = $facepp->execute('/person/get_info',array('person_name'=>$arr['person'][$j]['person_name']));
+                            		$arr_face = json_decode($get_face_id,true);
+                            		$get_img = $facepp->execute('/info/get_face',array('face_id'=>$arr_face['face'][0]['face_id']));
+                                    $arr_img = json_decode($get_img,true);
+                                    $img_url = $arr_img['face_info'][count($arr_img)-1]['url'];
+                            //if($arr_face['group'][0]['group_name'] != null){
+                        ?> 
+                    <li><a href="face/person/person_info.php?person_id=<?php echo $arr['person'][$j]['person_id'];?>" class="item-link">
+                      <div class="item-content">
+                        <div class="item-media"><img src="<?php echo $img_url;?>" width="60" height="60"></div>
+                        <div class="item-inner"> 
+                          <div class="item-title-row">
+                            <div class="item-title"><?php echo $arr['person'][$j]['person_name'];?></div>
+                            <div class="item-after"><?php echo $arr_face['tag'][0];?></div>
+                          </div>
+                          <div class="item-subtitle"><?php echo $arr_face['group'][0]['group_name'];?></div>
+                        </div>
+                      </div></a></li>
+                    <?php }?>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div id="view-4" class="view view-help tab">
-         <!-- Navbar -->
-        <div class="navbar">
-
-
-        </div>
-           <!-- Pages -->
-        <div class="pages navbar-through">
-		
-          </div>
+ 
       </div>
       <!-- Bottom Tabbar-->
       <div class="toolbar tabbar tabbar-labels">
         <div class="toolbar-inner">	
-        <a href="#view-1" class="tab-link active"> <i class="icon iconfont">&#xe60e;</i><span class="tabbar-label">我的设备</span></a>
-        <a href="#view-2" class="tab-link btn get_user_json"><i class="icon iconfont">&#xe603;</i><span class="tabbar-label">个人中心</span></a>
-        <a href="#view-3" class="tab-link">   <i class="icon iconfont">&#xe630;</i><span class="tabbar-label">情景模式</span></a>
-        <a href="#view-4" class="tab-link"> <i class="icon iconfont">&#xe62a;</i><span class="tabbar-label">使用帮助</span></a>
+        <a href="#view-1" class="tab-link active"> <i class="icon iconfont">&#xe60a;</i><span class="tabbar-label">我的设备</span></a>
+        <a href="#view-2" class="tab-link "><i class="icon iconfont">&#xe60b;</i><span class="tabbar-label">个人中心</span></a>
+        <a href="#view-3" class="tab-link"> <i class="icon iconfont">&#xe602;</i><span class="tabbar-label">Face++</span></a>
         </div>
       </div>
     </div>
@@ -282,7 +444,126 @@ function https_request($url)
       </div>
     </form>
   </div>
-</div>   
+</div>  
+<!-- Face++ 历史 popup -->
+<div  class="popup popup-face-history no-navbar no-toolbar no-swipeback">
+      <div class="view view-popup navbar-fixed">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="left"><a href="#" class="link close-popup">Cancel</a></div>
+            <div class="center sliding">Face++ 记录</div>
+          </div>
+        </div>
+        <div class="pages">
+          <div class="page">
+            <div class="page-content">
+               <div class="list-block cards-list">
+                  <ul>
+                    <li class="card">
+                      <div class="card-content">
+                        <div class="list-block media-list">
+                          <ul>
+                            <li class="item-content pb-standalone">
+                              <div class="item-media">
+                                <img src="http://ehac-img.stor.sinaapp.com/130649465939176112.jpg" width="44">
+                              </div>
+                              <div class="item-inner">
+                                <div class="item-title-row">
+                                  <div class="item-title">陌生人</div>
+                                </div>
+                                <div class="item-subtitle">15：20</div>
+                              </div>
+                            </li>
+                             
+                            <li class="item-content pb-standalone">
+                              <div class="item-media pb-standalone">
+                                <img src="http://ehac-img.stor.sinaapp.com/130649465939176112.jpg" width="44">
+                              </div>
+                              <div class="item-inner">
+                                <div class="item-title-row">
+                                  <div class="item-title">朋友</div>
+                                </div>
+                                <div class="item-subtitle">14：30</div>
+                              </div>
+                            </li>
+                            <li class="item-content pb-standalone">
+                              <div class="item-media">
+                                <img src="http://ehac-img.stor.sinaapp.com/130649465939176112.jpg" width="44">
+                              </div>
+                              <div class="item-inner">
+                                <div class="item-title-row">
+                                  <div class="item-title">朋友</div>
+                                </div>
+                                <div class="item-subtitle">13：00</div>
+                              </div>
+                            </li>                          
+                          </ul>
+                        </div>
+                      </div>
+                     
+                      <div class="card-footer">
+                        <span>2015/05/19</span>
+                        <span>3 条记录</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>        
+            </div>
+          </div>
+        </div>
+      </div>
+</div>  
+<!-- Face++ Group popup -->
+<div  class="popup popup-face-group no-navbar no-toolbar no-swipeback">
+      <div class="view view-popup navbar-fixed">
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="left"><a href="#" class="link close-popup">Cancel</a></div>
+            <div class="center sliding">Face++ Group</div>
+          </div>
+        </div>
+        <div class="pages">
+          <div class="page">
+            <div class="page-content">
+               <div class="content-block-title">分组管理</div>
+                <div class="list-block">
+                  <ul>
+                    <li class="item-content group_add">
+                      <div class="item-inner">
+                        <div class="item-title">添加分组</div>
+                      </div>
+                    </li>
+                    <li class="item-divider"></li>
+                    <?php
+					$get_group = $facepp->execute('/info/get_group_list',array(''));
+                    $arr_group = json_decode($get_group,true);
+                    $group_num = count($arr_group['group']);
+                    for($i=0;$i<$group_num;$i++)
+                    {
+					?>
+                      <li class="swipeout">
+                      <!-- 被“swipeout-content”包裹起来的普通列表元素 -->
+                      <div class="swipeout-content">
+                        <!-- 你的列表元素放在这里 -->
+                        <div class="item-content">
+                          <div class="item-inner" id="group_name"><?php echo $arr_group['group'][$i]['group_name'];?></div>
+                        </div>
+                      </div>
+                      <!-- Swipeout actions right -->
+                      <div class="swipeout-actions-right">
+                        <!-- Swipeout actions links/buttons -->
+                        <a href="#" class="swipeout-close bg-green">Edit</a>
+                        <a class="swipeout-close  bg-red group_del" onclick="del_group('<?php echo $arr_group['group'][$i]['group_name'];?>');">Del</a>
+                      </div>
+                    </li>
+                      <?php }?>
+                  </ul>
+                </div>  
+            </div>
+          </div>
+        </div>
+      </div>
+</div>  
     <!-- Popup 关于 -->     
 	   <div  class="popup popup-about no-navbar no-toolbar no-swipeback">
   <div class="content-block login-screen-content">
@@ -551,263 +832,3 @@ myApp.modal({
 
 }
 </script>
-     <!-- ECharts单文件引入 -->
-  <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
-    <script type="text/javascript">
-        // 基于准备好的dom，初始化echarts图表
-        var myChart = echarts.init(document.getElementById('smoke')); 
-        
-myChart.showLoading({
-    text: '正在努力的读取数据中...',    //loading话术
-});
-
-// ajax getting data...............
-
-// ajax callback
-myChart.hideLoading();
-	option = {
-    tooltip : {
-        formatter: "{a} <br/>{c} {b}"
-    },
-                loadingOption:{
-    
-    effect:'whirling',
-    
-    },
-    toolbox: {
-        show : false,
-        feature : {
-            mark : {show: true},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    series : [
-        
-        {
-            name:'烟雾浓度',
-            type:'gauge',
-            center : ['50%', 220],    // 默认全局居中
-            radius : 190,
-            min:0,
-            max:10000,
-            startAngle:150,
-            endAngle:30,
-            splitNumber:2,
-            axisLine: {            // 坐标轴线
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: [[0.2, 'lime'],[0.4, '#1e90ff'],[0.7, '#ff4500'],[1, 'red']],
-                    width: 2,
-                    shadowColor : '#fff', //默认透明
-                    shadowBlur: 10
-                }
-            },
-            axisTick: {            // 坐标轴小标记
-                length :5,        // 属性length控制线长
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto',
-                    shadowColor : '#fff', //默认透明
-                    shadowBlur: 10
-                }
-            },
-            axisLabel: {
-                textStyle: {       // 属性lineStyle控制线条样式
-                    fontWeight: 'bolder',
-                    color: 'auto',
-                    shadowColor : '#fff', //默认透明
-                    shadowBlur: 10
-                },
-                formatter:function(v){
-                    switch (v + '') {
-                        case '0' : return 'L';
-                        case '10000' : return 'H';
-                    }
-                }
-            },
-            splitLine: {           // 分隔线
-                length :8,         // 属性length控制线长
-                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    width:3,
-                    color:'auto',
-                    shadowColor : '#fff', //默认透明
-                    shadowBlur: 10
-                }
-            },
-            pointer: {
-                width:2,
-                shadowColor : '#fff', //默认透明
-                shadowBlur: 5
-            },
-             title : {
-                  show : false,
-                width: 80,
-                height:30,
-                offsetCenter: [25, -68], 
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    fontWeight: 'bolder',
-                    fontSize: 20,
-                    color: 'auto',
-               
-                }
-            },
-             detail : {
-                //backgroundColor: 'rgba(30,144,255,0.8)',
-               // borderWidth: 1,
-              
-                width: 80,
-                height:30,
-                formatter:'{value} ppm',
-                offsetCenter: [0, -80],       // x, y，单位px
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    fontWeight: 'bolder',
-                    color: 'auto',
-                    fontSize: 20,
-                }
-            },
-            data:[{value: <?php echo $yanwu;?>, name: 'ppm'}]
-        }
-    ]
-};
-         // 为echarts对象加载数据 
- myChart.setOption(option);
-      var myChart2 = echarts.init(document.getElementById('wenshidu'));                                 
- option2 = {
-  
-    tooltip : {
-        trigger: 'item',
-        formatter: "{a} <br/>{b} : {c}%"
-    },
-    toolbox: {
-        show : false,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    series : [
-        {
-            name:'温度',
-            type:'gauge',
-            center : ['50%', '70%'],    // 默认全局居中
-            radius : '40%',
-            min:-10,
-            max:50,
-            startAngle:0,
-            endAngle:-180,
-            splitNumber: 10,       // 分割段数，默认为5
-            axisLine: {            // 坐标轴线
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: [[0.2, '#228b22'],[0.8, '#48b'],[1, '#ff4500']], 
-                    width: 4
-                }
-            },
-            axisTick: {            // 坐标轴小标记
-                splitNumber: 10,   // 每份split细分多少段
-                length :6,        // 属性length控制线长
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                }
-            },
-            axisLabel: { 
-                show:false,// 坐标轴文本标签，详见axis.axisLabel
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    color: 'auto'
-                },
-                formatter:function(t){
-                    switch (t + '') {
-                        case '-10' : return 'L';
-                        case '0' : return '0';
-                        case '50' : return 'H';
-                    }
-                }
-            },
-            splitLine: {           // 分隔线
-                show: true,        // 默认显示，属性show控制显示与否
-                length :8,         // 属性length控制线长
-                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                }
-            },
-            pointer : {
-                width : 5,
-                color:'orange',
-            },
-            title : {
-                show : false,
-                offsetCenter: [0, -150],       // x, y，单位px
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    fontZise:14,
-                }
-            },
-            detail : {
-                show:false,
-                offsetCenter: [0, 25],
-                formatter:'温度：{value}℃',
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    color: 'orange',
-                    fontWeight: 'bolder',
-                    fontSize:16,
-                }
-            },
-            data:[{value: <?php echo $temp;?>, name: '℃'}]
-        },
-        {
-            name:'湿度',
-            type:'gauge',
-            splitNumber: 10,       // 分割段数，默认为5
-            axisLine: {            // 坐标轴线
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: [[0.2, '#228b22'],[0.8, '#48b'],[1, '#ff4500']], 
-                    width: 4
-                }
-            },
-            axisTick: {            // 坐标轴小标记
-                splitNumber: 10,   // 每份split细分多少段
-                length :8,        // 属性length控制线长
-                lineStyle: {       // 属性lineStyle控制线条样式
-                    color: 'auto'
-                }
-            },
-            axisLabel: {           // 坐标轴文本标签，详见axis.axisLabel
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    color: 'auto'
-                }
-            },
-            splitLine: {           // 分隔线
-                show: true,        // 默认显示，属性show控制显示与否
-                length :12,         // 属性length控制线长
-                lineStyle: {       // 属性lineStyle（详见lineStyle）控制线条样式
-                    color: 'auto'
-                }
-            },
-            pointer : {
-                width : 5
-            },
-            title : {
-                show : false,
-                offsetCenter: [0, 50],       // x, y，单位px
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    fontWeight: 'bolder'
-                }
-            },
-            detail : {
-                show:false,
-                offsetCenter: [0, 40],
-                formatter:'湿度：{value}%',
-                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
-                    color: 'blue',
-                    fontWeight: 'bolder',
-                    fontSize:16,
-                }
-            },
-            data:[{value: <?php echo $shidu;?>, name: '%'}]
-        }
-    ]
-};
-                    
-                          
-myChart2.setOption(option2);
-
-    </script>

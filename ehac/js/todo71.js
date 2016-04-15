@@ -1,6 +1,7 @@
 // Initialize your app
 var myApp = new Framework7({
-    modalTitle: 'ToDo7',
+    modalTitle: '智能家居云端',
+    smartSelectInPopup:true,
 	animateNavBackIcon:true,
 	smartSelectBackOnSelect:true,
 	swipeBackPage:true,
@@ -8,6 +9,7 @@ var myApp = new Framework7({
 	swipeBackPageThreshold:40,
 	swipePanel: 'right',
 	precompileTemplates: true,
+    externalLinks:'.unlink',
 });
 
 // Export selectors engine
@@ -38,7 +40,6 @@ myApp.onPageInit('color-themes', function (page) {
 var view1 = myApp.addView('#view-1', {
     // Because we use fixed-through navbar we can enable dynamic navbar
     dynamicNavbar: true,
-     domCache: true //enable inline pages
 });
 var view2 = myApp.addView('#view-2', {
     // Because we use fixed-through navbar we can enable dynamic navbar
@@ -66,11 +67,6 @@ var rightView = myApp.addView('.view-right', {
 
     // Load about page:
 view2.router.loadPage('userinfo.php');
-    // Load about page:
-view3.router.loadPage('scene.html');
-    // Load about page:
-view4.router.loadPage('help.html');
-
 $$(document).on('pageInit', function (e) {
     var page = e.detail.page;
     // Code for Updevice page
@@ -98,15 +94,77 @@ $$(document).on('pageInit', function (e) {
     cols: [
         {
             textAlign: 'left',
-            values: ('-10℃ -5℃ 0℃ 5℃ 10℃ 15℃ 20℃ 25℃').split(' ')
+            values: ('10℃ 11℃ 12℃ 13℃ 14℃ 15℃ 16℃ 17℃ 18℃ 19℃ 20℃ 21℃ 22℃ 23℃ 24℃ 25℃').split(' ')
         },
         { values:('-').split('')},
         {
-            values: ('15℃ 20℃ 25℃ 30℃ 35℃ 40℃ 45℃ 50℃').split(' ')
+            values: ('15℃ 16℃ 17℃ 18℃ 19℃ 20℃ 21℃ 22℃ 23℃ 24℃ 25℃ 26℃ 27℃ 28℃ 29℃ 30℃').split(' ')
         },
     ]
 }); 
 myPicker.open(); 
+    }  
+ //page person_info                               
+ if (page.name === 'person_info') {
+        //更新Person信息
+             $$('.person-edit').on('click', function () {
+                    var buttons1 = [
+                {
+                    text: 'Person Info',
+                    label: true
+                },
+                {
+                    text: '更改姓名',
+                    onClick: function () {
+                        myApp.prompt('请输入新的名字', function (value) {
+                            var name = document.getElementById("person_name").innerHTML;
+                            var url = encodeURI("/ehac/face/action.php?person_name="+name+"&name="+value);
+                            if (window.XMLHttpRequest)
+                              {// code for IE7+, Firefox, Chrome, Opera, Safari
+                              xmlhttp=new XMLHttpRequest();
+                              }
+                            else
+                              {// code for IE6, IE5
+                              xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                              }
+                            xmlhttp.onreadystatechange=function()
+                              {
+                              if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                                {
+                                document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+                                }
+                              }
+                            xmlhttp.open("GET",url,true);
+                            xmlhttp.send();
+                            myApp.alert('姓名已更改为：' + value + '！');
+                        });
+                    }
+                },
+                {
+                    text: '删除',
+                    onClick: function () {
+                        myApp.confirm('要删除吗?', function () {
+                            myApp.alert('删除成功！');
+                        });
+                    }
+             
+                }
+            ];
+            var buttons2 = [
+                {
+                    text: '取消',
+                    color: 'red'
+                }
+            ];
+            var groups = [buttons1, buttons2];
+    myApp.actions(groups);
+        });
+        //删除Face
+        $$('.del-face').on('click', function () {
+            myApp.confirm('删除Face?', function () {
+                myApp.alert('Face删除成功！');
+            });
+        });
     }
 });
         
@@ -221,4 +279,70 @@ $$('.open-slider-modal').on('click', function () {
   })
   myApp.swiper($$(modal).find('.swiper-container'), {pagination: '.swiper-pagination'});
 });
- 
+//添加分组
+$$('.group_add').on('click', function () {
+	myApp.prompt('请输入新的名字', function (value) {
+		var url = encodeURI("face/group/add.php?group_name="+value);
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState != 4)
+			{
+				myApp.showIndicator();
+			}
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+				myApp.hideIndicator();
+				myApp.alert("添加成功！");
+			}
+		}
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send(); 
+	});
+                    
+});
+//添加Person
+function addPerson()
+{
+var person_name = document.getElementById("addperson_person_name").value;
+var x=document.getElementById("addperson_group_name");
+var group_name = x.options[x.selectedIndex].text;
+var url = encodeURI("face/person/action.php?person_name="+person_name+"&group_name="+group_name);
+
+if (window.XMLHttpRequest)
+  {// code for IE7+, Firefox, Chrome, Opera, Safari
+  xmlhttp=new XMLHttpRequest();
+  }
+else
+  {// code for IE6, IE5
+  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+    }
+  }
+xmlhttp.open("GET",url,true);
+xmlhttp.send();
+myApp.modal({
+    title:  '',
+    text: '设备添加成功！',
+    buttons: [
+      {
+        text: '确定',
+        onClick: function() {
+            window.location.assign("/ehac/index.php")
+        }
+      },
+    ]
+  })
+ }

@@ -57,7 +57,7 @@ function fileSelectHandler() {
 
     // check for file size
     if (oFile.size > 250 * 1024) {
-        $('.error').html('图片过大，请重新选择照片！').show();
+        $('.error').html('You have selected too big file, please select a one smaller image file').show();
         return;
     }
 
